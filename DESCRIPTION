@@ -1,0 +1,35 @@
+Package: genix
+Type: Package
+Version: 1.0.0
+Date: 2023-08-01
+Authors@R: 
+    c(person("Nima", "Nouri", role=c("cre", "aut"), 
+      email="ni.nouri@gmail.com", comment=c(ORCID="0000-0001-8348-5717")))
+Title: Comparative analysis of gene association networks using single cell RNA 
+       sequencing data.
+Description: A glasso-based network construction approach that elucidates the 
+       identification of perturbation-relevant gene signatures.
+License: file LICENSE
+Copyrights: file COPYRIGHTS
+URL: https://github.com/Sanofi-Public/PMCB-genix
+BugReports: https://github.com/Sanofi-Public/PMCB-genix/issues
+BuildVignettes: true
+VignetteBuilder: knitr
+Suggests: knitr, rmarkdown, testthat (>= 3.0.0), BiocStyle,
+        Seurat
+Encoding: UTF-8
+biocViews: Workflow, SingleCellWorkflow, SingleCellNetwork
+Depends: R (>= 4.2.0), ggplot2 (>= 3.3.4)
+Imports: dplyr (>= 1.0), igraph (>= 1.0), 
+        Matrix, methods, rlang, stats, gtools,
+        dynamicTreeCut, glasso, scales
+RoxygenNote: 7.2.3
+Collate:
+    'Classes.R'
+    'Core.R'
+    'Data.R'
+    'genix.R'
+NeedsCompilation: no
+Packaged: 2023-05-03 10:20:41 UTC; biocbuild
+Config/testthat/edition: 3
+LazyData: true
