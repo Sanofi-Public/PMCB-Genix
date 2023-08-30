@@ -25,7 +25,7 @@ are sampled from a union of observed grph.1 and grph.2.}
 two-sided t-test p-value, which reflects the proportion 
 of permuted Jaccard indices that differ from the observed \code{ji}.}
 
-\item{\code{deltas_df}}{A data frame containing the features calculated per removal 
+\item{\code{deltas}}{A data frame containing the features calculated per removal 
                      of a given gene by comparing two networks grph.1 and grph.2.
 \itemize{ 
           \item    \code{gene}: gene name. 

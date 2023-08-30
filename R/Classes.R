@@ -12,7 +12,7 @@ setClassUnion("ListIgraph", members=c("list", "igraph"))
 #'
 #' \code{genixObj} defines constructNets outputs.
 #' 
-#' @slot  eic_graph   an estimated inverse covariance graph. The edges indicate
+#' @slot  icm_graph   an estimated inverse covariance graph. The edges indicate
 #'                    the partial correlation values. The nodes represent the genes.
 #' 
 #' @name         genixObj-class
@@ -74,7 +74,7 @@ setClass("compiledObj",
 #' @slot pvalue          The \code{permutations} distribution is used to calculate a 
 #'                       two-sided t-test p-value, which reflects the proportion 
 #'                       of permuted Jaccard indices that differ from the observed \code{ji}.
-#' @slot  deltas_df      A data frame containing the features calculated per removal 
+#' @slot  deltas         A data frame containing the features calculated per removal 
 #'                       of a given gene by comparing two networks grph.1 and grph.2.
 #'  \itemize{ 
 #'            \item    \code{gene}: gene name. 
@@ -108,7 +108,7 @@ setClass("compiledObj",
 setClass("comparedObj", 
          slots=c(ji = "numeric",
                  pvalue = "numeric",
-                 permutatins = "numeric",
+                 permutations = "numeric",
                  deltas = "data.frame",
                  inA = "character",
                  inB = "character",

@@ -14,7 +14,7 @@ genixObj
 \section{Slots}{
 
 \describe{
-\item{\code{eic_graph}}{an estimated inverse covariance graph. The edges indicate
+\item{\code{icm_graph}}{an estimated inverse covariance graph. The edges indicate
 the partial correlation values. The nodes represent the genes.}
 }}
 

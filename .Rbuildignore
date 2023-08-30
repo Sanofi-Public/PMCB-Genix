@@ -1,2 +1,9 @@
-^genie\.Rproj$
+^.*\.Rproj$
 ^\.Rproj\.user$
+^\.
+~$
+^test
+^data-raw
+^profil
+^Meta$
+^doc$

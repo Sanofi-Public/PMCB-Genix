@@ -502,7 +502,7 @@ compareNets <- function(grph.1, grph.2, n.perm=1000) {
   compared_obj <- new("comparedObj",
                       ji = sim_index,
                       pvalue = pvalue,
-                      permutatins = prmts,
+                      permutations = prmts,
                       deltas = dfp2,
                       inA = in_A,
                       inB = in_B,
