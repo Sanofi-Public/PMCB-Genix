@@ -6,8 +6,9 @@ Authors@R:
     c(person("Nima", "Nouri", role=c("cre", "aut"), 
       email="ni.nouri@gmail.com", comment=c(ORCID="0000-0001-8348-5717")))
 Title: Comparative analysis of gene association networks using single cell RNA 
-       sequencing data.
-Description: A glasso-based network construction approach that elucidates the 
+       sequencing data
+Description: GENIX (Gene Expression Network Importance eXamination) is a novel. 
+       A glasso-based network construction approach that elucidates the 
        identification of perturbation-relevant gene signatures.
 License: file LICENSE
 Copyrights: file COPYRIGHTS

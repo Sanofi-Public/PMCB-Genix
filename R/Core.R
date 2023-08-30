@@ -212,9 +212,8 @@ constructNets <- function(gex, glasso.rho=1.0,
 #'                            at least \code{hubs.th} fraction of other genes
 #'                            will be considered for hub detection.
 #' @param    ...              Additional arguments to be passed to 
-#'                            \link[cutreeDynamicTree]{cutreeDynamicTree}. 
-#'                            Otherwise, default values from the \code{cutreeDynamicTree} 
-#'                            function are used.
+#'                            \code{cutreeDynamicTree}. Otherwise, default values 
+#'                            from the \code{cutreeDynamicTree} function are used.
 #' 
 #' @return   a \link{compiledObj}. It can be a list of \code{compiledObj}s, 
 #'           if the \code{grph} contains a list \link{genixObj}s.
@@ -227,12 +226,12 @@ constructNets <- function(gex, glasso.rho=1.0,
 #'          with a degree exceeding at least 1.5 interquartile ranges above the 75th 
 #'          percentile of all degrees. Finally, the adjacency matrix calculated from 
 #'          the \code{graph} is retrieved to identify modules using the 
-#'          \link[cutreeDynamicTree]{cutreeDynamicTree} function.
+#'          \code{cutreeDynamicTree} function.
 #'
 #' @seealso  \link{constructNets} to construct a network. 
 #'           \link{compiledObj} for a \code{compileNets} output. 
-#'           \link[cutreeDynamicTree]{cutreeDynamicTree} for details about 
-#'           cutreeDynamicTree algorithm.
+#'           \code{dynamicTreeCut} package for details about 
+#'            \code{cutreeDynamicTree} algorithm.
 #' 
 #' @examples
 #' \dontrun{
@@ -521,7 +520,6 @@ compareNets <- function(grph.1, grph.2, n.perm=1000) {
 #' @description   Displays the distribution of degrees in a graph.
 #'
 #' @param    grph       an igraph object.
-#' @param    hist       if true, plots the distribution as histogram.
 #'   
 #' @return   A ggplot object.
 #'
@@ -546,7 +544,7 @@ compareNets <- function(grph.1, grph.2, n.perm=1000) {
 plotNetDegree <- function(grph) {
   # Hack for visibility of dplyr variables
   . <- NULL
-  Freq <- x <- y <- NULL
+  Freq <- x <- .x <- y <- NULL
   # ======================
   # Transitivity is the overall probability for the network to have adjacent 
   # nodes interconnected, thus revealing the existence of tightly connected 
@@ -604,6 +602,10 @@ plotNetDegree <- function(grph) {
 #'}
 #' 
 plotPermutes <- function(obj){
+  # Hack for visibility of dplyr variables
+  . <- NULL
+  x <- NULL
+  # ======================
   stopifnot(class(obj)[1] == "comparedObj")
   df <- data.frame(x = obj@permutatins)
   p <- ggplot(df, aes(x=x)) +

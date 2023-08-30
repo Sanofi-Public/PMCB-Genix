@@ -8,8 +8,6 @@ plotNetDegree(grph)
 }
 \arguments{
 \item{grph}{an igraph object.}
-
-\item{hist}{if true, plots the distribution as histogram.}
 }
 \value{
 A ggplot object.

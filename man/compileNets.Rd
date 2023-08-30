@@ -17,9 +17,8 @@ at least \code{hubs.th} fraction of other genes
 will be considered for hub detection.}
 
 \item{...}{Additional arguments to be passed to 
-\link[cutreeDynamicTree]{cutreeDynamicTree}. 
-Otherwise, default values from the \code{cutreeDynamicTree} 
-function are used.}
+\code{cutreeDynamicTree}. Otherwise, default values 
+from the \code{cutreeDynamicTree} function are used.}
 }
 \value{
 a \link{compiledObj}. It can be a list of \code{compiledObj}s, 
@@ -37,7 +36,7 @@ identifies modules and hub genes
          with a degree exceeding at least 1.5 interquartile ranges above the 75th 
          percentile of all degrees. Finally, the adjacency matrix calculated from 
          the \code{graph} is retrieved to identify modules using the 
-         \link[cutreeDynamicTree]{cutreeDynamicTree} function.
+         \code{cutreeDynamicTree} function.
 }
 \examples{
 \dontrun{
@@ -50,6 +49,6 @@ identifies modules and hub genes
 \seealso{
 \link{constructNets} to construct a network. 
           \link{compiledObj} for a \code{compileNets} output. 
-          \link[cutreeDynamicTree]{cutreeDynamicTree} for details about 
-          cutreeDynamicTree algorithm.
+          \code{dynamicTreeCut} package for details about 
+           \code{cutreeDynamicTree} algorithm.
 }
