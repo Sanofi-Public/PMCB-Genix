@@ -526,10 +526,9 @@ compareNets <- function(grph.1, grph.2, n.perm=1000) {
 #'
 #' @examples
 #' \dontrun{
-#' # first run  \link{compileNets} function example and pass the \link{cmpl_rslts} 
+#' # first run \link{compareNets} function example and pass the \code{cmpr_rslts} 
 #' 
-#' # plot degree distribution:
-#' plotNetDegree(cmpl_rslts$grp2)
+#' x <- fetchTVGs(cmpr_rslts, feature="delta_degree", sigma=1)
 #'}
 #' 
 #' @export
