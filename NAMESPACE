@@ -3,6 +3,7 @@
 export(compareNets)
 export(compileNets)
 export(constructNets)
+export(fetchTVGs)
 export(plotNetDegree)
 exportClasses(comparedObj)
 exportClasses(compiledObj)

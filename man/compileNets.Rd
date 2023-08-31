@@ -35,7 +35,7 @@ identifies modules and hub genes
          \code{hubs.th} (fraction) of the genes in the graph. An outlier is defined as a gene 
          with a degree exceeding at least 1.5 interquartile ranges above the 75th 
          percentile of all degrees. Finally, the adjacency matrix calculated from 
-         the \code{graph} is retrieved to identify modules using the 
+         the graph is retrieved to identify modules using the 
          \code{cutreeDynamicTree} function.
 }
 \examples{

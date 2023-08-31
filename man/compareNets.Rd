@@ -34,17 +34,17 @@ identifies the variations in topological features of two graphs
   graph similarity compared to the pre-removal.
   
   A permutation test is also developed to examine the statistical distinctiveness
-  of the graph.1 and graph.2. First, the two graphs are combined (union) into a
-  pull. Next, graph.1 and graph.2 are reconstructed by randomly sampling from
+  of the \code{grph.1} and \code{grph.2} First, the two graphs are combined (union) into a
+  pull. Next, \code{grph.1} and \code{grph.2} are reconstructed by randomly sampling from
   the pull, while preserving the original edge counts and connections, with
   no-replacement. A distribution of jaccard similarities is generated
   (n=\code{n.perm}). This distribution is utilized to calculate a two-sided
   t-test p-value, reflecting the proportion of permuted statistics that
-  differ from the observed jaccard index between graph.1 and graph.2.
+  differ from the observed jaccard index between \code{grph.1} and \code{grph.2}
 }
 \examples{
 \dontrun{
-  # first run \link{compileNets} example and pass the \code{cmpl_rslts}
+  # first run \link{compileNets} function example and pass the \code{cmpl_rslts}
   cmpr_rslts <- compareNets(grph.1=cmpl_rslts$grp1, grph.2=cmpl_rslts$grp2, 
                             n.perm=25)
 }

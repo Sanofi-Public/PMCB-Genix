@@ -134,7 +134,7 @@ cmpl_rslts <- compileNets(grph=rslts, degree.th=3, hubs.th=0.01,
                           minModuleSize=7)
 
 # get hub gene names and their degree of connectivity
-print(cmpl_rslts$grp1@hubs)
+print(head(cmpl_rslts$grp1@hubs))
 
 # get length of identified modules
 sapply(cmpl_rslts$grp1@modules, length)
@@ -144,7 +144,7 @@ To visualize the distribution of degrees in the compliled graph, pass on of the
 `cmpl_rslts` objects to `plotNetDegree` function: 
 
 ```{r compileNets.2, eval=TRUE, warning=FALSE, message=FALSE}
-plotNetDegree(cmpl_rslts$grp2)
+plotNetDegree(cmpl_rslts$grp1)
 ```
 
 **Comparing**: The last step involves comparing the topology of the constructed 
@@ -202,7 +202,7 @@ print(head(cmpr_rslts@deltas))
 
 # fetch top topological variant feasture
 tvgs <- fetchTVGs(cmpr_rslts, feature="delta_degree", sigma=1)
-print(head(tvg))
+print(head(tvgs))
 ```
 
 # Citing Genix

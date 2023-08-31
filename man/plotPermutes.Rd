@@ -7,7 +7,7 @@
 plotPermutes(obj)
 }
 \arguments{
-\item{obj}{an \link{comparedObj} object.}
+\item{obj}{a \link{comparedObj} object.}
 }
 \value{
 A ggplot object.
@@ -17,19 +17,10 @@ Displays the distribution of Jaccard index similarities
 }
 \examples{
 \dontrun{
-# getting the data:
-x <- get(data("sargentDemoData"))
+# first run \link{compareNets} function example and pass the \code{cmpr_rslts} 
 
-# running cell-type assignment:
-srgnt <- sargentAnnotation(gex=x$gex,
-                           gene.sets=x$gene.sets,
-                           adjacent.mtx=x$adjacent.mtx)
-
-fetchDotPlot(srgnt, 
-             genes = c("CD3D","CD3E","IL7R","ANPEP","SLC13A3","SLC17A3",
-                       "EMCN","NOTCH4","ADGRL4","CD79A","MS4A1","CD19",
-                       "CD14","MS4A7","FCGR3A"), 
-             min.pct=0.1)
+# plot permutation distribution:
+ plotPermutes(cmpr_rslts)
 }
 
 }

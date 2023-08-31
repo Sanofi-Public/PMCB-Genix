@@ -4,10 +4,10 @@
 \alias{plotNetDegree}
 \title{plots inferred network characteristics}
 \usage{
-plotNetDegree(grph)
+plotNetDegree(obj)
 }
 \arguments{
-\item{grph}{an igraph object.}
+\item{obj}{a \link{compiledObj} object.}
 }
 \value{
 A ggplot object.
@@ -17,19 +17,10 @@ Displays the distribution of degrees in a graph.
 }
 \examples{
 \dontrun{
-# getting the data:
-x <- get(data("sargentDemoData"))
+# first run  \link{compileNets} function example and pass the \link{cmpl_rslts} 
 
-# running cell-type assignment:
-srgnt <- sargentAnnotation(gex=x$gex,
-                           gene.sets=x$gene.sets,
-                           adjacent.mtx=x$adjacent.mtx)
-
-fetchDotPlot(srgnt, 
-             genes = c("CD3D","CD3E","IL7R","ANPEP","SLC13A3","SLC17A3",
-                       "EMCN","NOTCH4","ADGRL4","CD79A","MS4A1","CD19",
-                       "CD14","MS4A7","FCGR3A"), 
-             min.pct=0.1)
+# plot degree distribution:
+plotNetDegree(cmpl_rslts$grp2)
 }
 
 }
