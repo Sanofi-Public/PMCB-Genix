@@ -18,7 +18,7 @@ knitr::opts_chunk$set(collapse=TRUE)
 library(BiocStyle)
 ```
 
-![Genix logo.](genix-logo.png){width=250px height=200px}
+![](genix-logo.png){width=55% height=55%}
 
 Thank you for your interest in Genix! We present `genix` (Gene Expression Network
 Importance eXamination), a novel platform for constructing gene association
@@ -93,6 +93,8 @@ includes a `group` column that identifies the group to which each cell belongs:
 ```{r abbriv-table, eval=TRUE, warning=FALSE, message=FALSE}
 print(table(metadata$group))
 ```
+
+# Usecase
 
 `genix` performs in three sequential steps:
 
@@ -207,7 +209,7 @@ The hubness stsus of a given gene is mentioned in the column `type`
 
 ```{r compareNets.4, eval=TRUE, warning=FALSE, message=FALSE}
 # get topological feastures
-print(table(cmpr_rslts@type))
+print(table(cmpr_rslts@deltas$type))
 
 ```
 
@@ -223,6 +225,5 @@ citation("genix")
 
 This is the output of `sessionInfo()` on the system on which this document was compiled:
 ```{r}
-date()
 sessionInfo()
 ```
