@@ -24,6 +24,3 @@ Displays the distribution of Jaccard index similarities
 }
 
 }
-\seealso{
-\code{compareNets} to generate \link{comparedObj}.
-}

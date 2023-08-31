@@ -606,8 +606,6 @@ plotNetDegree <- function(obj) {
 #' @param    obj       a \link{comparedObj} object.
 #'   
 #' @return   A ggplot object.
-#'
-#' @seealso  \code{compareNets} to generate \link{comparedObj}. 
 #'           
 #' @examples
 #' \dontrun{
