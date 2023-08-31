@@ -5,9 +5,9 @@
 <img width="30%" src="vignettes/genix-logo.png"> 
 </p>
 
-# Sargent 
+# Genix 
 
-Sargent is a transformation- and cluster-free cell-type annotation method that 
+Genix is a transformation- and cluster-free cell-type annotation method that 
 operates at individual cell resolution by applying a scoring system to scRNA-seq 
 data based on sets of marker genes associated with cell types.
 
