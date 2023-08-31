@@ -18,7 +18,7 @@ knitr::opts_chunk$set(collapse=TRUE)
 library(BiocStyle)
 ```
 
-![Sargent logo.](genix-logo.png){width=75% height=75%}
+![Genix logo.](genix-logo.png){width=250px height=200px}
 
 Thank you for your interest in Genix! We present `genix` (Gene Expression Network
 Importance eXamination), a novel platform for constructing gene association
@@ -33,7 +33,7 @@ overview and introduction to Genix’s functionality.
 
 Genix can be installed from GitHub:
 
-```{r install-sargent, eval = FALSE}
+```{r install-genix, eval = FALSE}
 if (!require("devtools", quietly = TRUE))
   install.packages("devtools")
 
@@ -43,7 +43,7 @@ devtools::install_github("Sanofi-Public/PMCB-Genix",
 
 If you wish to build a local version of the vignette use:
 
-```{r vignette-sargent, eval = FALSE}
+```{r vignette-genix, eval = FALSE}
 if (!require("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 BiocManager::install("BiocStyle")
@@ -198,9 +198,17 @@ can be retrived by:
 # get topological feastures
 print(head(cmpr_rslts@deltas))
 
-# fetch top topological variant feasture
+# fetch top variant delta_degree
 tvgs <- fetchTVGs(cmpr_rslts, feature="delta_degree", sigma=1)
 print(head(tvgs))
+```
+
+The hubness stsus of a given gene is mentioned in the column `type`
+
+```{r compareNets.4, eval=TRUE, warning=FALSE, message=FALSE}
+# get topological feastures
+print(table(cmpr_rslts@type))
+
 ```
 
 # Citing Genix
@@ -218,5 +226,3 @@ This is the output of `sessionInfo()` on the system on which this document was c
 date()
 sessionInfo()
 ```
-
-# References
