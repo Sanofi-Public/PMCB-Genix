@@ -5,8 +5,8 @@ date: '`r BiocStyle::doc_date()`'
 package: "`r BiocStyle::pkg_ver('genix')`"
 bibliography: ref.bib
 vignette: >
-  %\VignetteIndexEntry{Comparative analysis of gene association networks using single cell RNA 
-       sequencing data}
+  %\VignetteIndexEntry{Comparative analysis of gene association networks using 
+       single cell RNA sequencing data}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 output:
@@ -22,108 +22,76 @@ library(BiocStyle)
 
 ![Sargent logo.](genix-logo.png){width=75% height=75%}
 
-Thank you for your interest in Sargent! Sargent is a normalization-free,
-cluster-free, and single cell-based annotation algorithm for rapidly identifying
-the cell-types of origin based on sets of cell type-specific marker genes. This
-vignette gives an overview and introduction to Sargent’s functionality.
+Thank you for your interest in Genix! We present GENIX (Gene Expression Network
+Importance eXamination), a novel platform for constructing gene association
+networks based on glasso algorithm, equipped with an innovative network-based 
+comparative model to uncover condition-relevant genes. This vignette gives an 
+overview and introduction to Genix’s functionality.
 
 # Installation
 
-Sargent can be installed from GitHub:
+Genix can be installed from GitHub:
 
 ```{r install-sargent, eval = FALSE}
 if (!require("devtools", quietly = TRUE))
   install.packages("devtools")
 
-devtools::install_github("Sanofi-Public/PMCB-Sargent", 
+devtools::install_github("Sanofi-Public/PMCB-Genix", 
                          build_vignettes=FALSE)
 ```
 
 If you wish to build a local version of the vignette use:
 
 ```{r vignette-sargent, eval = FALSE}
-if (!require("Seurat", quietly = TRUE))
-  install.packages("Seurat")
-
 if (!require("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 BiocManager::install("BiocStyle")
 
-devtools::install_github("Sanofi-Public/PMCB-Sargent", 
+devtools::install_github("Sanofi-Public/PMCB-Genix", 
                          build_vignettes=TRUE)
 ```
 
 # Setup
 
-To run the examples in this tutorial, you will need to install the `Seurat`,
-`ggplot2`, and `dplyr` packages. Once all installed, they can be loaded with the
+To run the examples in this tutorial, you will need to install the `ggplot2` 
+and `dplyr` packages. Once all installed, they can be loaded with the
 following commands:
 
 ```{r require libraries, eval=TRUE, warning=FALSE, message=FALSE}
 # Load required packages
-library(Seurat)
 library(ggplot2)
 library(dplyr)
-library(sargent)
+library(genix)
 ```
 
-A small example database, `sargentDemoData`, is included in the `sargent`
-package. This database contains a small subset of 100 cells from human kidney
-from Tabula Sapiens Consortium [@tabula2022tabula], manually annotated by
-experts. This database contains multiple items, but for the sake of this
-tutorial we will only need the gene expression matrix (`gex`) and associated
-meta-data (`mt.data`). The expression matrix is from a single-cell RNA-seq
-dataset and is formatted with genes as rows and cells as columns.  We extract
-the relevant information for this demo using the following commands:
+A small example database, `genixDemoData`, is included in the `genix`
+package. This database contains the gene expression matrix of 200 cells (`gex`). 
+The expression matrix is from a single-cell RNA-seq dataset and is formatted
+with genes as rows and cells as columns. This database also contains an
+associated meta-data (`metadata`). We extract the relevant information for this
+demo using the following commands:
 
 ```{r load-data, eval=TRUE, warning=FALSE, message=FALSE}
+# load the demo data
+data("genixDemoData")
+
 # Access gene expression
-gex <- get(data("sargentDemoData"))$gex
+gex <- genixDemoData$gex
 print(dim(gex))
 print(gex[1:10,1:10])
 
 # Access meta data
-mt.data <- get(data("sargentDemoData"))$mt.data
-print(dim(mt.data))
-print(head(mt.data))
+metadata <- genixDemoData$metadata
+print(dim(metadata))
+print(head(metadata))
 ```
 
-There are three columns in `mt.data`: 1) `organ_tissue` contains organ tissue
-information, 2) `free_annotation` contains experts’ annotation, and 3)
-`celltype` contains abbreviations for cell-type compartments, e.g. `B` for B
-cells, `MPh` for Myeloid-lineage cells, `TNK` for T and Natural killer cells,
-`Endo` for Endothelial, and `Epit` for Epithelial:
+There are multiple columns in `metadata`. Typical `seurat` metadata columns including 
+`orig.ident`, `nCount_RNA`, and `nFeature_RNA`. In addition, it includes 
+`group` column which identifies to which group each cell belongs to:
 
 ```{r abbriv-table, eval=TRUE, warning=FALSE, message=FALSE}
-print(table(mt.data$free_annotation, mt.data$celltype))
-```
-
-The `TNK` is a curated group, for the sake of this tutorial, to combine
-cell-types of similar phenotypes (e.g., T and Natural killer cells). In Section
-4 of this tutorial, we will demonstrate how to split this group back into their
-original sub-types.
-
-The other input required for annotation is annotating recipe: a list of
-gene-sets to explore on the cells. This is the fundamental building block of
-`sargent` and an important information for an accurate outcome. Therefore,
-investigators should have a broad understanding of cells and corresponding
-markers they expect to observe in the tissue under investigation. In this demo,
-for instance, we are exploring cells from Kidney, so one would expect to
-discover Immune, Endothelial, and Epithelial cell-types. Cell-type signatures
-should be provided in a vector format stored in a list:
-
-```{r build-gene-set, eval=TRUE, warning=FALSE, message=FALSE}
-gene.sets <- list("Endo" = c("TGFBR2", "NOTCH4", "ADGRL4", "EMCN", "ENG", 
-                             "PECAM1", "PLVAP", "TEK", "KDR", "EPCAM", 
-                             "GJA5", "CDH5", "SEMA3G", "PTPRB", "SLC14A1"), 
-                  "Epit" = c("ANPEP", "AQP1", "SLC13A3", "SLC16A9", "SLC17A3", 
-                             "SLC22A7", "SLC22A8"),
-                  "TNK" = c("CD4", "CD3D", "CD3E", "CD3G", "IL7R", "CD8A", 
-                            "CD8B", "FOXP3", "TIGIT", "CD27", "NCAM1", "KLRF1", 
-                            "GNLY", "NKG7", "TNFRSF18"),
-                  "B" = c("CD79A", "CD79B", "MS4A1", "CD19", "JCHAIN"),
-                  "MPh" = c("CD4", "MS4A7", "VCAN", "CD14", "FCN1", "LYZ", 
-                            "FCGR3A", "ITGAM", "MARCO", "CD1C", "ITGAX"))
+print(table(metadata$group))
 ```
 
 Annotation in `sargent` is performed in three sequential steps:
