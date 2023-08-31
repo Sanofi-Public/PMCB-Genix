@@ -7,8 +7,8 @@
 
 # Genix 
 
-GENIX (Gene Expression Network Importance eXamination) is a novel. A
-glasso-based network construction approach that elucidates the identification of
+GENIX (Gene Expression Network Importance eXamination) is a novel glasso-based
+network construction approach that elucidates the  identification of
 perturbation-relevant gene signatures.
 
 
