@@ -225,7 +225,7 @@ constructNets <- function(gex, glasso.rho=1.0,
 #'          \code{hubs.th} (fraction) of the genes in the graph. An outlier is defined as a gene 
 #'          with a degree exceeding at least 1.5 interquartile ranges above the 75th 
 #'          percentile of all degrees. Finally, the adjacency matrix calculated from 
-#'          the \code{graph} is retrieved to identify modules using the 
+#'          the graph is retrieved to identify modules using the 
 #'          \code{cutreeDynamicTree} function.
 #'
 #' @seealso  \link{constructNets} to construct a network. 
@@ -387,20 +387,20 @@ compileNets <- function(grph, degree.th=NULL, hubs.th=NULL, ...) {
 #'   graph similarity compared to the pre-removal.
 #'   
 #'   A permutation test is also developed to examine the statistical distinctiveness
-#'   of the graph.1 and graph.2. First, the two graphs are combined (union) into a
-#'   pull. Next, graph.1 and graph.2 are reconstructed by randomly sampling from
+#'   of the \code{grph.1} and \code{grph.2} First, the two graphs are combined (union) into a
+#'   pull. Next, \code{grph.1} and \code{grph.2} are reconstructed by randomly sampling from
 #'   the pull, while preserving the original edge counts and connections, with
 #'   no-replacement. A distribution of jaccard similarities is generated
 #'   (n=\code{n.perm}). This distribution is utilized to calculate a two-sided
 #'   t-test p-value, reflecting the proportion of permuted statistics that
-#'   differ from the observed jaccard index between graph.1 and graph.2.
+#'   differ from the observed jaccard index between \code{grph.1} and \code{grph.2}
 #'
 #' @seealso  \link{constructNets} to construct a network.
 #'           \link{compiledObj} for a \link{compileNets} output. 
 #' 
 #' @examples
 #' \dontrun{
-#'   # first run \link{compileNets} example and pass the \code{cmpl_rslts}
+#'   # first run \link{compileNets} function example and pass the \code{cmpl_rslts}
 #'   cmpr_rslts <- compareNets(grph.1=cmpl_rslts$grp1, grph.2=cmpl_rslts$grp2, 
 #'                             n.perm=25)
 #' }
@@ -513,35 +513,60 @@ compareNets <- function(grph.1, grph.2, n.perm=1000) {
 }
 
 
+#' @title topological variant genes
+#' @description   filter genes with topological feastures above a threshold.
+#'
+#' @param    obj       a \link{comparedObj} object.
+#' @param    feature a character. The feature by which to filter the data.
+#' @param    sigma a numeric. The standard deviation coefficient.
+#'   
+#' @return   A data.frame containing gene names that have passed the filter of
+#'   \code{sigma}*\code{sd}(\code{feature}). The output data.frame is sorted by
+#'   the values of \code{feature} in descending order.
+#'
+#' @examples
+#' \dontrun{
+#' # first run  \link{compileNets} function example and pass the \link{cmpl_rslts} 
+#' 
+#' # plot degree distribution:
+#' plotNetDegree(cmpl_rslts$grp2)
+#'}
+#' 
+#' @export
+fetchTVGs <- function(obj, feature, sigma=1) {
+  # Hack for visibility of dplyr variables
+  . <- NULL
+  x <- NULL
+  
+  thrshld <- sigma*sd(obj@deltas[[feature]])
+  message(paste("*** fitering genes with absolute value larger than", round(thrshld, 4), "in", feature))
+  x <- obj@deltas %>%
+    dplyr::filter(abs(!!as.symbol(feature)) > thrshld) %>%
+    dplyr::arrange(desc(!!as.symbol(feature)))
+  return(x)
+}
+
+
 #### Summary functions ####
 
 
 #' @title plots inferred network characteristics
 #' @description   Displays the distribution of degrees in a graph.
 #'
-#' @param    grph       an igraph object.
+#' @param    obj       a \link{compiledObj} object.
 #'   
 #' @return   A ggplot object.
 #'
 #' @examples
 #' \dontrun{
-#' # getting the data:
-#' x <- get(data("sargentDemoData"))
+#' # first run  \link{compileNets} function example and pass the \link{cmpl_rslts} 
 #' 
-#' # running cell-type assignment:
-#' srgnt <- sargentAnnotation(gex=x$gex,
-#'                            gene.sets=x$gene.sets,
-#'                            adjacent.mtx=x$adjacent.mtx)
-#'
-#' fetchDotPlot(srgnt, 
-#'              genes = c("CD3D","CD3E","IL7R","ANPEP","SLC13A3","SLC17A3",
-#'                        "EMCN","NOTCH4","ADGRL4","CD79A","MS4A1","CD19",
-#'                        "CD14","MS4A7","FCGR3A"), 
-#'              min.pct=0.1)
+#' # plot degree distribution:
+#' plotNetDegree(cmpl_rslts$grp2)
 #'}
 #' 
 #' @export
-plotNetDegree <- function(grph) {
+plotNetDegree <- function(obj) {
   # Hack for visibility of dplyr variables
   . <- NULL
   Freq <- x <- .x <- y <- NULL
@@ -553,7 +578,7 @@ plotNetDegree <- function(grph) {
   # type: The type of the transitivity to calculate. Possible values:
   # "global": The global transitivity of an undirected graph. This is simply the 
   # ratio of the count of triangles and connected triples in the graph. 
-  g.degrees <- igraph::degree(grph)
+  g.degrees <- igraph::degree(obj@graph)
   g.degree.hist <- data.frame(g.degrees = as.numeric(names(table(g.degrees))),
                               Freq =as.vector(table(g.degrees)))
   p <- ggplot(g.degree.hist, 
@@ -561,7 +586,7 @@ plotNetDegree <- function(grph) {
     theme_bw() + 
     theme(axis.text = element_text(size = 16, face = "bold"),
           axis.title = element_text(size = 15, face = "bold")) +
-    ggtitle("Degree Distribution", subtitle = paste0("Graph transitivity: ", round(igraph::transitivity(grph), 2))) +
+    ggtitle("Degree Distribution", subtitle = paste0("Graph transitivity: ", round(igraph::transitivity(obj@graph), 2))) +
     xlab("Connectivity") + ylab("Frequency") + 
     geom_point(size = 2, shape = 1) +
     geom_smooth(size = 0.35, method = 'loess', formula = y ~ x) +
@@ -578,7 +603,7 @@ plotNetDegree <- function(grph) {
 #' @title graphs distinctiveness
 #' @description  Displays the distribution of Jaccard index similarities 
 #'
-#' @param    obj       an \link{comparedObj} object.
+#' @param    obj       a \link{comparedObj} object.
 #'   
 #' @return   A ggplot object.
 #'
@@ -586,19 +611,10 @@ plotNetDegree <- function(grph) {
 #'           
 #' @examples
 #' \dontrun{
-#' # getting the data:
-#' x <- get(data("sargentDemoData"))
+#' # first run \link{compareNets} function example and pass the \code{cmpr_rslts} 
 #' 
-#' # running cell-type assignment:
-#' srgnt <- sargentAnnotation(gex=x$gex,
-#'                            gene.sets=x$gene.sets,
-#'                            adjacent.mtx=x$adjacent.mtx)
-#'
-#' fetchDotPlot(srgnt, 
-#'              genes = c("CD3D","CD3E","IL7R","ANPEP","SLC13A3","SLC17A3",
-#'                        "EMCN","NOTCH4","ADGRL4","CD79A","MS4A1","CD19",
-#'                        "CD14","MS4A7","FCGR3A"), 
-#'              min.pct=0.1)
+#' # plot permutation distribution:
+#'  plotPermutes(cmpr_rslts)
 #'}
 #' 
 plotPermutes <- function(obj){
@@ -607,7 +623,7 @@ plotPermutes <- function(obj){
   x <- NULL
   # ======================
   stopifnot(class(obj)[1] == "comparedObj")
-  df <- data.frame(x = obj@permutatins)
+  df <- data.frame(x = obj@permutations)
   p <- ggplot(df, aes(x=x)) +
     theme_bw() + 
     theme(axis.text = element_text(size = 16, face = "bold"),
@@ -689,4 +705,3 @@ twoSetsCommp <- function(A,B){
   inB     <-  both %in% B
   return(table(inA,inB))
 }
-                                                                                                                                                                                                                                                                     
