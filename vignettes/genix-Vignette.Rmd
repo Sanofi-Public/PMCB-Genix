@@ -1,0 +1,421 @@
+---
+title: 'Introduction to Genix'
+author: "Nima Nouri"
+date: '`r BiocStyle::doc_date()`'
+package: "`r BiocStyle::pkg_ver('genix')`"
+bibliography: ref.bib
+vignette: >
+  %\VignetteIndexEntry{Comparative analysis of gene association networks using single cell RNA 
+       sequencing data}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+output:
+    BiocStyle::html_document:
+        toc: true
+        toc_float: true
+---
+
+```{r knitr-options, echo = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(collapse=TRUE)
+library(BiocStyle)
+```
+
+![Sargent logo.](genix-logo.png){width=75% height=75%}
+
+Thank you for your interest in Sargent! Sargent is a normalization-free,
+cluster-free, and single cell-based annotation algorithm for rapidly identifying
+the cell-types of origin based on sets of cell type-specific marker genes. This
+vignette gives an overview and introduction to Sargent’s functionality.
+
+# Installation
+
+Sargent can be installed from GitHub:
+
+```{r install-sargent, eval = FALSE}
+if (!require("devtools", quietly = TRUE))
+  install.packages("devtools")
+
+devtools::install_github("Sanofi-Public/PMCB-Sargent", 
+                         build_vignettes=FALSE)
+```
+
+If you wish to build a local version of the vignette use:
+
+```{r vignette-sargent, eval = FALSE}
+if (!require("Seurat", quietly = TRUE))
+  install.packages("Seurat")
+
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install("BiocStyle")
+
+devtools::install_github("Sanofi-Public/PMCB-Sargent", 
+                         build_vignettes=TRUE)
+```
+
+# Setup
+
+To run the examples in this tutorial, you will need to install the `Seurat`,
+`ggplot2`, and `dplyr` packages. Once all installed, they can be loaded with the
+following commands:
+
+```{r require libraries, eval=TRUE, warning=FALSE, message=FALSE}
+# Load required packages
+library(Seurat)
+library(ggplot2)
+library(dplyr)
+library(sargent)
+```
+
+A small example database, `sargentDemoData`, is included in the `sargent`
+package. This database contains a small subset of 100 cells from human kidney
+from Tabula Sapiens Consortium [@tabula2022tabula], manually annotated by
+experts. This database contains multiple items, but for the sake of this
+tutorial we will only need the gene expression matrix (`gex`) and associated
+meta-data (`mt.data`). The expression matrix is from a single-cell RNA-seq
+dataset and is formatted with genes as rows and cells as columns.  We extract
+the relevant information for this demo using the following commands:
+
+```{r load-data, eval=TRUE, warning=FALSE, message=FALSE}
+# Access gene expression
+gex <- get(data("sargentDemoData"))$gex
+print(dim(gex))
+print(gex[1:10,1:10])
+
+# Access meta data
+mt.data <- get(data("sargentDemoData"))$mt.data
+print(dim(mt.data))
+print(head(mt.data))
+```
+
+There are three columns in `mt.data`: 1) `organ_tissue` contains organ tissue
+information, 2) `free_annotation` contains experts’ annotation, and 3)
+`celltype` contains abbreviations for cell-type compartments, e.g. `B` for B
+cells, `MPh` for Myeloid-lineage cells, `TNK` for T and Natural killer cells,
+`Endo` for Endothelial, and `Epit` for Epithelial:
+
+```{r abbriv-table, eval=TRUE, warning=FALSE, message=FALSE}
+print(table(mt.data$free_annotation, mt.data$celltype))
+```
+
+The `TNK` is a curated group, for the sake of this tutorial, to combine
+cell-types of similar phenotypes (e.g., T and Natural killer cells). In Section
+4 of this tutorial, we will demonstrate how to split this group back into their
+original sub-types.
+
+The other input required for annotation is annotating recipe: a list of
+gene-sets to explore on the cells. This is the fundamental building block of
+`sargent` and an important information for an accurate outcome. Therefore,
+investigators should have a broad understanding of cells and corresponding
+markers they expect to observe in the tissue under investigation. In this demo,
+for instance, we are exploring cells from Kidney, so one would expect to
+discover Immune, Endothelial, and Epithelial cell-types. Cell-type signatures
+should be provided in a vector format stored in a list:
+
+```{r build-gene-set, eval=TRUE, warning=FALSE, message=FALSE}
+gene.sets <- list("Endo" = c("TGFBR2", "NOTCH4", "ADGRL4", "EMCN", "ENG", 
+                             "PECAM1", "PLVAP", "TEK", "KDR", "EPCAM", 
+                             "GJA5", "CDH5", "SEMA3G", "PTPRB", "SLC14A1"), 
+                  "Epit" = c("ANPEP", "AQP1", "SLC13A3", "SLC16A9", "SLC17A3", 
+                             "SLC22A7", "SLC22A8"),
+                  "TNK" = c("CD4", "CD3D", "CD3E", "CD3G", "IL7R", "CD8A", 
+                            "CD8B", "FOXP3", "TIGIT", "CD27", "NCAM1", "KLRF1", 
+                            "GNLY", "NKG7", "TNFRSF18"),
+                  "B" = c("CD79A", "CD79B", "MS4A1", "CD19", "JCHAIN"),
+                  "MPh" = c("CD4", "MS4A7", "VCAN", "CD14", "FCN1", "LYZ", 
+                            "FCGR3A", "ITGAM", "MARCO", "CD1C", "ITGAX"))
+```
+
+Annotation in `sargent` is performed in three sequential steps:
+
+**Scoring**: `sargent` uses a score-based procedure to infer the cell-type of
+origin for each cell among given gene-sets. This procedure transforms an input
+gene-by-cell expression matrix into a corresponding gene-set-by-cell assignment
+score matrix. Then, each individual cell is labeled with the cell-type with the
+highest assignment score.
+
+**Trimming**: `sargent` uses a measure of dispersion, gini-index, to identify
+ambiguous calls. First, it calculates a gini-index among assignment scores per
+cell, transforming the gene-set-by-cell assignment score matrix to a
+distribution of indexes. Then, two conditions are evaluated. First, whether the
+gini-index is more than `gini.sigma` (adjustable) below the mean of
+distribution. The default `gini.sigma` is equal to 3 and is motivated by the
+fact that for a normal distribution, 99.7% of  observations lie within three
+standard deviations of the mean. Smaller values for `gini.sigma` will increase
+the stringency in confidence of assignments. Second, whether the gini-index is
+less than `gini.min` (adjustable). Statistically, a gini index below 0.5
+(default) does not represent a severe dispersion, suggesting a poor annotation.
+Such ambiguous calls remain unclassified and are relabeled as `unclassified`s.
+
+**Smoothing**: One last step is k-nearest neighbor smoothing (optional input).
+This step is designed to smoothen annotations by aggregating information from
+cells with similar genome-wide expression profiles (neighbors). Smoothing is
+performed by first identifying cells with a minimum of `n.neighbors`
+nearest-neighbors (default is 10). Then, if more than 50% of neighbors reach a
+consensus on their labels, the surrounded cell will be relabeled according to
+the neighbors' verdict. Investigators can build such matrix using standard
+`Seurat` pipeline with the following commands:
+
+```{r make-adjacent, eval=TRUE, warning=FALSE, message=FALSE}
+adjacent.mtx <- attr(CreateSeuratObject(counts=gex) %>%
+                         NormalizeData(., normalization.method="LogNormalize", 
+                                       scale.factor=1e6, verbose=FALSE) %>%
+                         FindVariableFeatures(., selection.method="vst", 
+                                              nfeatures=2000, verbose=FALSE) %>%
+                         ScaleData(., do.scale=TRUE, do.center=TRUE, 
+                                   verbose=FALSE) %>%
+                         RunPCA(., features=VariableFeatures(.), 
+                                verbose=FALSE) %>%
+                         FindNeighbors(., reduction="pca", dims=1:30, 
+                                       k.param=20, verbose=FALSE), 
+                     which="graphs")[["RNA_nn"]]
+print(dim(adjacent.mtx))
+print(adjacent.mtx[1:10,1:10])
+```
+
+# Annotation and Diagnosis
+
+After we have selected the dataset we wish to annotate, defined our gene set
+marker lists (and build the optional k-nearest neighbor matrix), we pass all of
+the information as inputs into the `sargentAnnotation` function to infer
+cell-types:
+
+```{r annotate-all, eval=TRUE, warning=FALSE, message=FALSE}
+srgnt <- sargentAnnotation(gex=gex,
+                           gene.sets=gene.sets,
+                           adjacent.mtx=adjacent.mtx)
+```
+
+This function will produce the inferred cell types from the data provided and
+output the results in a  `sargentObject`. A summary of annotations can be seen
+with a print command:
+
+```{r print-summary, eval=TRUE, warning=FALSE, message=FALSE}
+print(srgnt)
+```
+
+We can compare our inferred annotation against the experts’ original annotation
+in a table:
+
+```{r compare, eval=TRUE, warning=FALSE, message=FALSE}
+table(predicted=fetchAssignment(srgnt), truth=mt.data$celltype)
+```
+
+`sargent` contains a set of stand-alone functions to investigate the
+performance of its annotation algorithm. For instance, we use `fetchDensityPlot`
+function to visualize the distribution of dispersion measures. Below we can see
+that assignments have high gini-index (a gini-index above 0.5 represents severe
+dispersion among cell-types assignment-scores), suggesting a trustworthy
+annotation:
+
+```{r dispersion measures, eval=TRUE, warning=FALSE, message=FALSE, fig.height=3.0, fig.width=5}
+fetchDensityPlot(srgnt)
+```
+The red vertical dashed-line marks the lower-leg of the `gini.sigma` of the
+distribution (mean-3*SD). The black vertical dashed-line marks the `gini.min`.
+
+To explore the expression of genes that were used in annotation, we pass the
+`srgnt` object to `fetchDotPlot` function with the following command:
+
+```{r fetchDotPlot-1, eval=TRUE, warning=FALSE, message=FALSE, fig.height=4.0, fig.width=10}
+fetchDotPlot(srgnt, min.pct=0.1) + 
+  theme(axis.text.y=element_text(size=17),
+        legend.title=element_text(size=14),
+          legend.text=element_text(size=13)) +
+  scale_x_discrete(limits = c("Endo", "Epit", "TNK", "B", "MPh"))
+```
+
+Instead of making a dot-plot, we can directly explore the annotation outcomes.
+Sargent object includes a `data.frame` which contains a summary of outcomes for
+given cell-types and gene markers in the following columns: 
+
+  * `cell_count`: number of cells per cell-type,
+  * `cell_exp_count`: number of cells that express a given gene, 
+  * `pct_exp`: fraction of cells that express a given gene,
+  * `mean_exp`: average expression, 
+  * `z_score`: z-score calculated across given cell-types.
+  
+This summary is accessible with the following command:
+
+```{r celltype-summary-1, eval=TRUE, warning=FALSE, message=FALSE, fig.height=3.0, fig.width=5.0}
+# gene expression summary for each marker
+print(head(srgnt@celltype_summary, 6))
+```
+
+# Sub-annotation
+
+A prudent strategy to annotate single-cell RNA-seq data is to annotate cells
+according to the hierarchy of known cell-types. In Sections 2 of this demo, we
+first annotated T and Natural Killer cells into one group, `TNK`. In this
+section, we continue sub-annotating until we achieve our desired granularity.
+
+`fetchCell` function allows us to extract cell-ids assigned to a specific
+cell-type, (e.g. the `TNK` cell-type):
+
+
+```{r fetch-cells, eval=TRUE, warning=FALSE, message=FALSE}
+# get cells annotated as T or Natural Killer cells (TNKs)
+cells <- fetchCell(srgnt, cell.types="TNK")$cell
+print(cells[1:5])
+```
+
+Next, we build a new recipe to distinguish T cells from Natural Killer cells,
+followed by construction of a nearest-neighbor graph for the `TNK`
+subpopulation:
+
+```{r negative-markers, eval=TRUE, warning=FALSE, message=FALSE}
+# list of gene markers
+gene.sets.tnk <- list("T" = c("CD4", "CD3D", "CD3E", "CD3G", "IL7R", "CD8A", "CD8B", "FOXP3", "TIGIT",
+                              "CD27", "NKG7", "GNLY"),
+                      "NK" = c("KLRF1", "KLRC1", "KLRC2", "NCAM1", "FGFBP2", "FCGR3A", "CX3CR1", 
+                               "NCR1", "FCER1G", "KDELC1", "NKG7", "GNLY", "KLRD1", "CD7"))
+
+# Nearest-neighbor graph construction
+adj.mtx.tnk <- attr(CreateSeuratObject(counts=gex) %>%
+                      subset(., cell=cells) %>%
+                      NormalizeData(., normalization.method="LogNormalize", scale.factor=1e6, verbose=FALSE) %>%
+                      FindVariableFeatures(., selection.method="vst", nfeatures=2000, verbose=FALSE) %>%
+                      ScaleData(., do.scale=TRUE, do.center=TRUE, verbose=FALSE) %>%
+                      RunPCA(., features=VariableFeatures(.), npcs=15, verbose=FALSE) %>%
+                      FindNeighbors(., reduction="pca", dims=1:15, k.param=5, verbose=FALSE), 
+                    which="graphs")[["RNA_nn"]]
+
+```
+
+An additional functionality of `sargent` is its ability to incorporate lowly
+expressed signatures. By default, the signature genes are expected to be highly
+expressed in one particular cell-type compared to all other cell-types. However,
+genes that are characteristically lowly expressed in one cell-type compared to
+the other cell-types can also be used as signatures. For example, the lack of
+expression of 'IL7R', 'CD3D', and 'CD8A' in Natural Killer cells can be utilized
+as a part of their signature. This functionality helps to increase dispersion in
+assignment scores among cell-types with similar expression profiles.
+Investigators can use `gene.sets.neg` argument in `sargentAnnotation` function
+to introduce lowly expressed signatures:
+
+```{r annotate-tnk, eval=TRUE, warning=FALSE, message=FALSE, fig.height=3.0, fig.width=6}
+# annotate TNK subset  
+ srgnt_tnk <- sargentAnnotation(gex=gex, 
+                                cells=cells,
+                                gene.sets=gene.sets.tnk,
+                                gene.sets.neg = list("T" = c("KLRF1", "KLRC1"),
+                                                     "NK" = c("IL7R", "CD3D", "CD8A")),
+                                adjacent.mtx=adj.mtx.tnk)
+ print(srgnt_tnk)
+```
+
+The expression of selected signatures can also be explored with the
+`fetchDotPlot` function:
+
+```{r fetchDotPlot-2, eval=TRUE, warning=FALSE, message=FALSE, fig.height=2.5, fig.width=5.5}
+genes <- c("CD3D", "CD3E", "CD8A", "CD4","IL7R",
+           "NKG7", "GNLY", "FGFBP2", "FCGR3A", "FCER1G")
+fetchDotPlot(srgnt_tnk, genes=genes) + 
+    theme(axis.text.y=element_text(size=13),
+          legend.key.height=grid::unit(8, "points"), 
+          legend.key.width=grid::unit(10, "points"),
+          legend.spacing=grid::unit(7, "points"))
+```
+
+# Novel Cell-type Discovery
+
+`sargent` can also be used to discover novel cell-types. For example, in this
+demo, we seek to identify regulatory cells among annotated T cells. Again, the
+first step is to develop a recipe of signature genes. Then, `sargent` calculates
+assignment scores according to the gene-set. The assignment score distribution
+tends to be bi-modal, where the lower mode represents cells with low expression
+of signature genes (`unclassified`s) and the higher mode represents those with high
+expression of signature genes (`REG`s in this scenario). Therefore, a reasonable
+choice of score threshold is one that separates these two modes. Investigators
+can use `only.score` argument from `sargentAnnotation` to first visualize the
+distribution of assignment scores:
+
+```{r find-threshold, eval=TRUE, warning=FALSE, message=FALSE, fig.height=3.0, fig.width=5.0}
+
+# get cells annotated as T cells
+cells <- fetchCell(srgnt_tnk, cell.types="T")$cell
+
+# regulatory gene signitures
+gene_sets_treg <- list("REG" = c("FOXP3", "TIGIT",  "CTLA4",
+                                 "IL2RA", "TNFRSF9", "IKZF2"))
+
+# calculate assignment scores
+srgnt_scr <- sargentAnnotation(gex=gex, cells=cells,
+                               gene.sets=gene_sets_treg, only.score=TRUE)
+
+# visulaize score distribution
+fetchDensityPlot(srgnt_scr)
+```
+
+For this scenario, a threshold of 0.2 is able to cleanly separate the two modes
+of the distribution. The `score.threshold` argument from `sargentAnnotation` is
+available to apply this threshold with the following command:
+
+```{r annotate-treg, eval=TRUE, warning=FALSE, message=FALSE, fig.height=3.0, fig.width=5.0}
+# annotate cells
+srgnt_treg <- sargentAnnotation(gex=gex, cells=cells,
+                                gene.sets=gene_sets_treg, score.threshold=0.2)
+
+# print outcome
+print(srgnt_treg)
+```
+
+A summary of annotation outcomes is accessible with the following command:
+
+```{r celltype-summary-2, eval=TRUE, warning=FALSE, message=FALSE, fig.height=3.0, fig.width=5.0}
+# gene expression summary for each marker
+print(head(srgnt_treg@celltype_summary, 12))
+```
+
+Another functionality of `sargent` that we use in this training is
+`fetchMergeSargents`. This function combines multiple `sargentObject`s into one
+`data.frame` based on the given cell ids. If a cell id appears in multiple
+objects, it will separate its labels by `.`. This function is useful when
+investigators intend to follow a hierarchical annotation workflow:
+
+```{r merge-srgnts, eval=TRUE, warning=FALSE, message=FALSE, fig.height=3.0, fig.width=5.0}
+print(srgnt)
+
+print(srgnt_tnk)
+
+print(srgnt_treg)
+
+# merge three sargent objects to one data.frame
+srgnt_all <- fetchMergeSargents(srgnt, srgnt_tnk, srgnt_treg)
+print(head(srgnt_all, 10))
+
+print(table(srgnt_all$celltype))
+```
+
+# FAQs
+
+*Can gene signatures be shared across multiple cell-types?*
+
+Yes, gene signatures can be shared across multiple cell-types. However, the
+elements of annotating recipe should be decisive enough (i.e., include markers
+unique to a specific cell-type) to guide `sargent` to accurately distinguish
+cell-types.
+
+*What is the best strategy to achieve an accurate annotation?*
+
+A prudent strategy to improve annotation accuracy is to build a hierarchy of
+known cell-types and perform sub-annotation in each level, until the desired
+granularity is achieved.
+
+# Citing Sargent
+
+If you use Sargent in your work please cite our paper:
+
+```{r citation}
+citation("sargent")
+```
+
+# Session information {.unnumbered}
+
+This is the output of `sessionInfo()` on the system on which this document was compiled:
+```{r}
+date()
+sessionInfo()
+```
+
+# References
