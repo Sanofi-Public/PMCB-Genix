@@ -14,7 +14,7 @@ data based on sets of marker genes associated with cell types.
 
 ## Installation
 
-**sargent** can be installed directly from this github with:
+**genix** can be installed directly from this github with:
 
 ```{r}
 if (!require("devtools", quietly = TRUE))
