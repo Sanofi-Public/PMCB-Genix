@@ -198,12 +198,16 @@ can be retrived by:
 
 ```{r compareNets.3, eval=TRUE, warning=FALSE, message=FALSE}
 # get topological feastures
-head(cmpr_rslts@deltas)
+print(head(cmpr_rslts@deltas))
+
+# fetch top topological variant feasture
+tvgs <- fetchTVGs(cmpr_rslts, feature="delta_degree", sigma=1)
+print(head(tvg))
 ```
 
-# Citing Sargent
+# Citing Genix
 
-If you use Sargent in your work please cite our paper:
+If you use `genix` in your work please cite our paper:
 
 ```{r citation}
 citation("genix")

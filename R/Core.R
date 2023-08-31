@@ -513,12 +513,13 @@ compareNets <- function(grph.1, grph.2, n.perm=1000) {
 }
 
 
-#' @title topological variant genes
+#' @title Topological variant gene identification
 #' @description   filter genes with topological feastures above a threshold.
 #'
 #' @param    obj       a \link{comparedObj} object.
-#' @param    feature a character. The feature by which to filter the data.
-#' @param    sigma a numeric. The standard deviation coefficient.
+#' @param    feature   a character. The feature by which to filter the data.
+#' @param    sigma     a numeric. The standard deviation coefficient by which to 
+#'                     filter the data.
 #'   
 #' @return   A data.frame containing gene names that have passed the filter of
 #'   \code{sigma}*\code{sd}(\code{feature}). The output data.frame is sorted by
@@ -538,7 +539,7 @@ fetchTVGs <- function(obj, feature, sigma=1) {
   x <- NULL
   
   thrshld <- sigma*sd(obj@deltas[[feature]])
-  message(paste("*** fitering genes with absolute value larger than", round(thrshld, 4), "in", feature))
+  message(paste("*** fitering genes with absolute value larger than", round(thrshld, 4), "in", feature, "feature."))
   x <- obj@deltas %>%
     dplyr::filter(abs(!!as.symbol(feature)) > thrshld) %>%
     dplyr::arrange(desc(!!as.symbol(feature)))
