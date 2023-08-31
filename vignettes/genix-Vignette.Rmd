@@ -3,10 +3,8 @@ title: 'Introduction to Genix'
 author: "Nima Nouri"
 date: '`r BiocStyle::doc_date()`'
 package: "`r BiocStyle::pkg_ver('genix')`"
-bibliography: ref.bib
 vignette: >
-  %\VignetteIndexEntry{Comparative analysis of gene association networks using 
-       single cell RNA sequencing data}
+  %\VignetteIndexEntry{Comparative analysis of gene association networks using single cell RNA sequencing data}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 output:

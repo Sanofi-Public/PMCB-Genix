@@ -30,7 +30,7 @@
 #' @import      ggplot2
 #' @import      methods
 #' @importFrom  glasso          glasso
-#' @importFrom  dplyr           n %>% filter select mutate summarize rename
+#' @importFrom  dplyr           n %>% filter select mutate summarize rename desc
 #' @importFrom  igraph          intersection union ecount vcount degree closeness 
 #'                              betweenness transitivity graph_from_adjacency_matrix 
 #'                              as_adjacency_matrix delete.vertices V E 
@@ -39,7 +39,7 @@
 #' @importFrom  scales          log10_trans trans_breaks trans_format
 #' @importFrom  Matrix          rowSums colSums Matrix
 #' @importFrom  rlang           sym syms 
-#' @importFrom  stats           t.test hclust as.dist cov IQR quantile
+#' @importFrom  stats           t.test hclust as.dist cov IQR quantile sd
 #' @importFrom  graphics        hist
 #' @importFrom  dynamicTreeCut  cutreeDynamicTree
 NULL

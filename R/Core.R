@@ -617,6 +617,7 @@ plotNetDegree <- function(obj) {
 #'  plotPermutes(cmpr_rslts)
 #'}
 #' 
+#' @export
 plotPermutes <- function(obj){
   # Hack for visibility of dplyr variables
   . <- NULL
