@@ -7,9 +7,9 @@
 
 # Genix 
 
-Genix is a transformation- and cluster-free cell-type annotation method that 
-operates at individual cell resolution by applying a scoring system to scRNA-seq 
-data based on sets of marker genes associated with cell types.
+GENIX (Gene Expression Network Importance eXamination) is a novel. A
+glasso-based network construction approach that elucidates the identification of
+perturbation-relevant gene signatures.
 
 
 ## Installation
@@ -20,21 +20,18 @@ data based on sets of marker genes associated with cell types.
 if (!require("devtools", quietly = TRUE))
   install.packages("devtools")
 
-devtools::install_github("Sanofi-Public/PMCB-Sargent", 
+devtools::install_github("Sanofi-Public/PMCB-Genix", 
                          build_vignettes=FALSE)
 ```
 
 If you wish to build a local version of the vignette use:
 
 ```{r}
-if (!require("Seurat", quietly = TRUE))
-  install.packages("Seurat")
-
 if (!require("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 BiocManager::install("BiocStyle")
 
-devtools::install_github("Sanofi-Public/PMCB-Sargent", 
+devtools::install_github("Sanofi-Public/PMCB-Genix", 
                          build_vignettes=TRUE)
 ```
 
@@ -49,24 +46,23 @@ Once installed the best place to get started is the [vignette][vignette].
 For help and questions please contact the [sargent's maintenance team](mailto:nima.nouri@sanofi.com).
 
 
-## Citing Sargent
+## Citing Genix
 
-If you use Sargent please cite our paper: Nouri N. et al. "A marker gene-based 
-method for identifying the cell-type of origin from single-cell RNA sequencing 
-data", MethodsX, 2023, [doi:10.1016/j.mex.2023.102196][paper].
+If you use Genix please cite our paper: Nouri N. et al. "Comparative Analysis of
+Association Networks Using Single-Cell RNA Sequencing Data Reveals
+Perturbation-Relevant Gene Signatures", JOURNAL, 2023, DOI.
 
 ```
   @Article{,
     author = {Nima Nouri et al.},
-    title = {A marker gene-based method for identifying the cell-type of origin 
-             from single-cell RNA sequencing data},
-    journal = {MethodsX},
+    title = {Comparative Analysis of Association Networks Using Single-Cell RNA 
+    Sequencing Data Reveals Perturbation-Relevant Gene Signatures},
+    journal = {Journal},
     year = {2023},
-    url = {https://www.sciencedirect.com/science/article/pii/S2215016123001966},
-    doi = {10.1016/j.mex.2023.102196},
+    url = {URL},
+    doi = {DOI},
   }
 ```
 
-[vignette]: https://github.com/Sanofi-Public/PMCB-Sargent/blob/master/vignettes/Sargent-Vignette.Rmd
-[bioc]: https://bioconductor.org/packages/devel/bioc/html/sargent.html
-[paper]: https://www.sciencedirect.com/science/article/pii/S2215016123001966
+[vignette]: https://github.com/Sanofi-Public/PMCB-Genix/blob/master/vignettes/Genix-Vignette.Rmd
+[bioc]: https://bioconductor.org/packages/devel/bioc/html/genix.html
