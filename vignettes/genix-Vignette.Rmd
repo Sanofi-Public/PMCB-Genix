@@ -141,7 +141,9 @@ sapply(cmpl_rslts$grp1@modules, length)
 ```
 
 To visualize the distribution of degrees in the compliled graph, pass on of the 
-`cmpl_rslts` objects to `plotNetDegree` function: 
+`cmpl_rslts` objects to `plotNetDegree` function. In this plot, the x-axis
+represents the degree of each gene (the number of connections), and the y-axis
+shows the number of genes with a specific degree:
 
 ```{r compileNets.2, eval=TRUE, warning=FALSE, message=FALSE}
 plotNetDegree(cmpl_rslts$grp1)
@@ -178,6 +180,15 @@ print(round(cmpr_rslts@ji, 4))
 # plot permutatiion test results
 plotPermutes(cmpr_rslts)
 ```
+
+The histogram above illustrates the distribution of Jaccard index similarities
+(x-axis) obtained from the permutation test, comparing the pairs of networks
+that are sampled (n=25) from a union of observed networks from `grph.1` and `grph.2`.
+The y-axis indicates the density of occurrences for each similarity. The
+vertical red dashed line denotes the observed similarity value. The displayed
+p-value at the top is calculated using a two-sided t-test and serves to
+demarcate statistically significant (p < 0.05) differences in network
+structures.
 
 Finally, to calculate the topological variations of genes, we devised a 
 two-dimensional topological measure, which involves comparing the structure of 
