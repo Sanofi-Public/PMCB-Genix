@@ -182,8 +182,8 @@ plotPermutes(cmpr_rslts)
 ```
 
 The histogram above illustrates the distribution of Jaccard index similarities
-(x-axis) obtained from the permutation test, comparing the pairs of networks
-that are sampled (n=25) from a union of observed networks from `grph.1` and `grph.2`.
+(x-axis) obtained from the permutation test, comparing the pairs of graphs
+that are sampled (n=25) from a union of observed graphs, `grph.1` and `grph.2`.
 The y-axis indicates the density of occurrences for each similarity. The
 vertical red dashed line denotes the observed similarity value. The displayed
 p-value at the top is calculated using a two-sided t-test and serves to
@@ -192,7 +192,7 @@ structures.
 
 Finally, to calculate the topological variations of genes, we devised a 
 two-dimensional topological measure, which involves comparing the structure of 
-`grph.1` and `grph.2` inferred networks. First `compareNets` function performs an 
+`grph.1` and `grph.2` inferred graphs. First `compareNets` function performs an 
 iterative gene removal process in both graphs. With each gene removal, the 
 similarity index between graphs is recalculated. The gene removal impact (GRI)
 for each gene is then calculated as the relative difference in post-removal
@@ -204,14 +204,14 @@ we derived the gene centrality change (GCC) metric.
 `compareNets` further calculates the normalized values of degree,
 closeness, and betweenness for each gene in two graphs, `grph.1` and `grph.2`. 
 It then substrates the calculated topological characteristics to report deltas.
-Positive values indicate that the feature is larger in the grph.2. All this information 
-can be retrived by: 
+Positive values indicate that the feature is larger in the `grph.2`. All this 
+information can be retrived by: 
 
 ```{r compareNets.3, eval=TRUE, warning=FALSE, message=FALSE}
 # get topological feastures
 print(head(cmpr_rslts@deltas))
 
-# fetch top variant delta_degree
+# fetch top delta_degree's with above 1-sigma variation
 tvgs <- fetchTVGs(cmpr_rslts, feature="delta_degree", sigma=1)
 print(head(tvgs))
 ```
