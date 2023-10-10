@@ -25,10 +25,12 @@ NULL
 #' @param    scale.gex         if TRUE, the count expression matrix is normalized 
 #'                             to the mean library size, where each cell is scaled 
 #'                             to sum up to the mean total counts. Default is false.
-#' @param    qc.gex            A numeric vector. Include cells and genes detected in 
-#'                             at least this fraction of genes (first numeric) and 
-#'                             cells (second numeric), respectively. Default is a 
-#'                             minimum qc to remove zero rows and columns.
+#' @param    qc.gex            A numeric vector of two fractions. The first fraction 
+#'                             is used as a threshold to filter out cells that express 
+#'                             fewer number of genes than this fraction. The second fraction is 
+#'                             employed to exclude genes expressed in fewer number of cells than 
+#'                             this specified fraction. Default is a minimum qc to remove 
+#'                             zero rows and columns.
 #' @param    ...               Additional arguments to be passed to \link[glasso]{glasso}. 
 #'                             Otherwise, default values from the \code{glasso} 
 #'                             function are used.
