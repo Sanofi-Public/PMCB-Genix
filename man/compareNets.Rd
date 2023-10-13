@@ -4,12 +4,12 @@
 \alias{compareNets}
 \title{Compares topological characteristics of two graphs}
 \usage{
-compareNets(grph.1, grph.2, n.perm = 1000)
+compareNets(grph_1, grph_2, n.perm = 1000)
 }
 \arguments{
-\item{grph.1}{A \code{compiledObj} object.}
+\item{grph_1}{A \code{compiledObj} object.}
 
-\item{grph.2}{A \code{compiledObj} object.}
+\item{grph_2}{A \code{compiledObj} object.}
 
 \item{n.perm}{An integer. Number of times to perform permutation
 test between two graphs.}
@@ -22,11 +22,11 @@ identifies the variations in topological features of two graphs
 }
 \details{
 \code{compareNets} calculates the normalized values of degree,
-  closeness, and betweenness for each gene in two graphs, grph.1 and grph.2. 
+  closeness, and betweenness for each gene in two graphs, grph_1 and grph_2. 
   It then substrates the calculated topological characteristics to report deltas.
-  Positive values indicate that the feature is larger in the grph.2. 
+  Positive values indicate that the feature is larger in the grph_2. 
   
-  The function also calculates the similarity between grph.1 and grph.2 using the
+  The function also calculates the similarity between grph_1 and grph_2 using the
   Jaccard index, considering both shared genes and edges. It then performs an
   iterative gene removal process in both graphs. With each gene removal, 
   the similarity index between graphs is recalculated. The gene removal impact 
@@ -34,18 +34,18 @@ identifies the variations in topological features of two graphs
   graph similarity compared to the pre-removal.
   
   A permutation test is also developed to examine the statistical distinctiveness
-  of the \code{grph.1} and \code{grph.2} First, the two graphs are combined (union) into a
-  pull. Next, \code{grph.1} and \code{grph.2} are reconstructed by randomly sampling from
+  of the \code{grph_1} and \code{grph_2} First, the two graphs are combined (union) into a
+  pull. Next, \code{grph_1} and \code{grph_2} are reconstructed by randomly sampling from
   the pull, while preserving the original edge counts and connections, with
   no-replacement. A distribution of jaccard similarities is generated
   (n=\code{n.perm}). This distribution is utilized to calculate a two-sided
   t-test p-value, reflecting the proportion of permuted statistics that
-  differ from the observed jaccard index between \code{grph.1} and \code{grph.2}
+  differ from the observed jaccard index between \code{grph_1} and \code{grph_2}
 }
 \examples{
 \dontrun{
   # first run \link{compileNets} function example and pass the \code{cmpl_rslts}
-  cmpr_rslts <- compareNets(grph.1=cmpl_rslts$grp1, grph.2=cmpl_rslts$grp2, 
+  cmpr_rslts <- compareNets(grph_1=cmpl_rslts$grp1, grph_2=cmpl_rslts$grp2, 
                             n.perm=25)
 }
 

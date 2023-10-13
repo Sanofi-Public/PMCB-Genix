@@ -156,22 +156,22 @@ interaction strength is highly condition-specific, and topologically invariant
 genes, whose connectivity pattern is not predominantly influenced by the perturbation.
 
 ```{r compareNets.1, eval=TRUE, warning=FALSE, message=FALSE}
-cmpr_rslts <- compareNets(grph.1=cmpl_rslts$grp1, 
-                          grph.2=cmpl_rslts$grp2, 
+cmpr_rslts <- compareNets(grph_1=cmpl_rslts$grp1, 
+                          grph_2=cmpl_rslts$grp2, 
                           n.perm=25)
 ```
 
-The function first calculates the similarity between `grph.1` and `grph.2` using the
+The function first calculates the similarity between `grph_1` and `grph_2` using the
 Jaccard index, considering both shared genes and edges. Next, to stablish that the
 observed differences in network structures are not mere artifacts of random
 noise, but rather indicative of significant variations a permutation test is
 developed. First, the two graphs are combined (union) into a pull. Next,
-`grph.1` and `grph.2` are reconstructed by randomly sampling from
+`grph_1` and `grph_2` are reconstructed by randomly sampling from
 the pull, while preserving the original edge counts and connections, with
 no-replacement. A distribution of jaccard similarities is generated
 (`n.perm` time). This distribution is utilized to calculate a two-sided
 t-test p-value, reflecting the proportion of permuted statistics that
-differ from the observed jaccard index between `grph.1` and `grph.2`.
+differ from the observed jaccard index between `grph_1` and `grph_2`.
 
 ```{r compareNets.2, eval=TRUE, warning=FALSE, message=FALSE}
 # print jaccard index similarity
@@ -183,7 +183,7 @@ plotPermutes(cmpr_rslts)
 
 The histogram above illustrates the distribution of Jaccard index similarities
 (x-axis) obtained from the permutation test, comparing the pairs of graphs
-that are sampled (n=25) from a union of observed graphs, `grph.1` and `grph.2`.
+that are sampled (n=25) from a union of observed graphs, `grph_1` and `grph_2`.
 The y-axis indicates the density of occurrences for each similarity. The
 vertical red dashed line denotes the observed similarity value. The displayed
 p-value at the top is calculated using a two-sided t-test and serves to
@@ -192,19 +192,19 @@ structures.
 
 Finally, to calculate the topological variations of genes, we devised a 
 two-dimensional topological measure, which involves comparing the structure of 
-`grph.1` and `grph.2` inferred graphs. First `compareNets` function performs an 
+`grph_1` and `grph_2` inferred graphs. First `compareNets` function performs an 
 iterative gene removal process in both graphs. With each gene removal, the 
 similarity index between graphs is recalculated. The gene removal impact (GRI)
 for each gene is then calculated as the relative difference in post-removal
 graph similarity compared to the pre-removal. To complement the GRI metric, we also 
 incorporated the change in gene centrality to enhance our analysis. By comparing 
-the normalized degree of connectivity for each gene within the `grph.1` and `grph.2`, 
+the normalized degree of connectivity for each gene within the `grph_1` and `grph_2`, 
 we derived the gene centrality change (GCC) metric. 
 
 `compareNets` further calculates the normalized values of degree,
-closeness, and betweenness for each gene in two graphs, `grph.1` and `grph.2`. 
+closeness, and betweenness for each gene in two graphs, `grph_1` and `grph_2`. 
 It then substrates the calculated topological characteristics to report deltas.
-Positive values indicate that the feature is larger in the `grph.2`. All this 
+Positive values indicate that the feature is larger in the `grph_2`. All this 
 information can be retrived by: 
 
 ```{r compareNets.3, eval=TRUE, warning=FALSE, message=FALSE}

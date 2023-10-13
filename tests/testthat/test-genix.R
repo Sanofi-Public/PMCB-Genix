@@ -20,8 +20,8 @@ test_that("test genix", {
   hubs_obs <- names(cmpl_rslts$grp1@hubs)[c(2,28,32)]
   expect_equal(hubs_exp, hubs_obs)
   # test compareNets
-  cmpr_rslts <- compareNets(grph.1=cmpl_rslts$grp1, 
-                            grph.2=cmpl_rslts$grp2, 
+  cmpr_rslts <- compareNets(grph_1=cmpl_rslts$grp1, 
+                            grph_2=cmpl_rslts$grp2, 
                             n.perm=25)
   expect_equal(0.2179, round(cmpr_rslts@ji, 4))
   expect_equal(91, cmpr_rslts@inAB_mtx[1,2])
