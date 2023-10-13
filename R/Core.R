@@ -369,10 +369,10 @@ compileNets <- function(grph, degree.th=NULL, hubs.th=NULL, ...) {
 #' @title Compares topological characteristics of two graphs
 #' @description   identifies the variations in topological features of two graphs
 #'
-#' @param    grph.1           A \code{compiledObj} object. 
-#' @param    grph.2           A \code{compiledObj} object. 
-#' @param    n.perm           An integer. Number of times to perform permutation
-#'                            test between two graphs.
+#' @param    grph.1             A \code{compiledObj} object. 
+#' @param    grph.2             A \code{compiledObj} object. 
+#' @param    n.perm             An integer. Number of times to perform permutation
+#'                              test between two graphs.
 #' 
 #' @return   a \link{comparedObj}.
 #'
