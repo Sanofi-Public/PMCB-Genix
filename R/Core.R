@@ -89,9 +89,9 @@ constructNets <- function(gex, glasso.rho=1.0,
                min_gene=floor(qc.gex[1]*dim(y)[1]), 
                min_cell=floor(qc.gex[2]*dim(y)[2]))$gex 
     if (verbose) {
-      message("*** ", paste("A matrix of group", x, "with", dim(y)[1], "genes and", dim(y)[2], "cells proceed."))
+      message("*** ", paste("A matrix of group", x, "with", dim(y)[1], "genes and", dim(y)[2], "cells proceeds."))
     } else { 
-      message("*** ", paste("A matrix with", dim(y)[1], "genes and", dim(y)[2], "cells proceed."))
+      message("*** ", paste("A matrix with", dim(y)[1], "genes and", dim(y)[2], "cells proceeds."))
     }
     y <- Matrix::t(y)  
     return(y)
@@ -268,7 +268,7 @@ compileNets <- function(grph, degree.th=NULL, hubs.th=NULL, ...) {
       rm_nodes <- which(igraph::degree(gr) < degree.th)
       gr <- igraph::delete.vertices(gr, rm_nodes)
       message("*** ", paste0(length(rm_nodes), " genes removed."))
-      message("*** ", paste0("A graph of ", igraph::vcount(gr), " genes and ", igraph::ecount(gr), " edges proceed."))
+      message("*** ", paste0("A graph of ", igraph::vcount(gr), " genes and ", igraph::ecount(gr), " edges proceeds."))
     }
     # ======================      
     # find hubs
