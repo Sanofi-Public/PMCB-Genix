@@ -26,9 +26,9 @@ NULL
 #'                             to the mean library size, where each cell is scaled 
 #'                             to sum up to the mean total counts. Default is false.
 #' @param    qc.gex            A numeric vector of two fractions. The first fraction 
-#'                             is used as a threshold to filter out cells that express 
-#'                             fewer number of genes than this fraction. The second fraction is 
-#'                             employed to exclude genes expressed in fewer number of cells than 
+#'                             is used as a threshold to retain cells that express 
+#'                             larger number of genes than this fraction. The second fraction is 
+#'                             employed to retain genes expressed in larger number of cells than 
 #'                             this specified fraction. Default is a minimum qc to remove 
 #'                             zero rows and columns.
 #' @param    ...               Additional arguments to be passed to \link[glasso]{glasso}. 
@@ -643,11 +643,11 @@ plotPermutes <- function(obj){
 # Helper function for gex qc
 qcGex <- function(gex, min_gene=0, min_cell=0) {
   dims_i <- dim(gex)
-  while (any(Matrix::colSums(gex != 0) < min_gene) | any(Matrix::rowSums(gex != 0) < min_cell)) {
-    # filtered out cells for which fewer than min_gene genes were detected,
-    # and genes that were expressed in fewer than min_cell cells.
-    gex <- gex[, Matrix::colSums(gex != 0) >= min_gene ]
-    gex <- gex[Matrix::rowSums(gex != 0) >= min_cell , ]
+  while (any(Matrix::colSums(gex != 0) <= min_gene) | any(Matrix::rowSums(gex != 0) <= min_cell)) {
+    # retain cells in which larger than min_gene genes were detected,
+    # and genes that were expressed in larger than min_cell cells.
+    gex <- gex[, Matrix::colSums(gex != 0) > min_gene ]
+    gex <- gex[Matrix::rowSums(gex != 0) > min_cell , ]
   }
   dims_f <- dim(gex)
   # ===================================

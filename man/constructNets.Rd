@@ -36,9 +36,9 @@ to the mean library size, where each cell is scaled
 to sum up to the mean total counts. Default is false.}
 
 \item{qc.gex}{A numeric vector of two fractions. The first fraction 
-is used as a threshold to filter out cells that express 
-fewer number of genes than this fraction. The second fraction is 
-employed to exclude genes expressed in fewer number of cells than 
+is used as a threshold to retain cells that express 
+larger number of genes than this fraction. The second fraction is 
+employed to retain genes expressed in larger number of cells than 
 this specified fraction. Default is a minimum qc to remove 
 zero rows and columns.}
 
